@@ -1,0 +1,3 @@
+streamlit>=1.30.0
+langchain>=0.1.0
+openai>=1.0.0
