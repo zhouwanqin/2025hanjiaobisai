@@ -11,8 +11,6 @@ def visualize_metrics(metrics):
     ax = fig.add_subplot(111)
     ax.bar(dimensions, scores, color='skyblue')
     ax.set_title("Rating Dimensions Bar Char")
-    ax.set_xlabel("")
-    ax.set_ylabel("")
     ax.set_ylim(0, 10)  # y轴最大值固定为10
     ax.grid(axis='y', linestyle='--', alpha=0.7)
 
