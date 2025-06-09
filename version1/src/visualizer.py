@@ -1,9 +1,6 @@
 import matplotlib.pyplot as plt
 
 def visualize_metrics(metrics):
-    # 设置中文字体支持
-    plt.rcParams['font.sans-serif'] = ['SimHei']  # 使用SimHei字体显示中文
-    plt.rcParams['axes.unicode_minus'] = False       # 解决负号显示问题
 
     # 提取评分维度及得分
     dimensions = list(metrics.keys())
