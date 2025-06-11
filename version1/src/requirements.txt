@@ -5,3 +5,5 @@ pandas
 numpy
 seaborn
 openai
+langchain-openai
+langchain-community
