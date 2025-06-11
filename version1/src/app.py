@@ -1,6 +1,6 @@
 import os
 import streamlit as st
-from langchain.chat_models import ChatOpenAI
+from langchain_openai import ChatOpenAI
 from extract_model import extract_metrics
 from visualizer import visualize_metrics
 import json
