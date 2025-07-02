@@ -76,8 +76,7 @@ please answer in English
 
 # Streamlit 应用
 st.set_page_config(page_title="汉语作文批改与修改助手", layout="wide")
-st.title("💯 Assistant for correcting and modifying Chinese compositions
-            汉语作文批改与修改助手")
+st.title("💯 Assistant for correcting and modifying Chinese compositions 汉语作文批改与修改助手")
 
 # 创建两个选项卡
 tab1, tab2 = st.tabs(["📝 作文批改", "🤖 作文修改聊天机器人"])
