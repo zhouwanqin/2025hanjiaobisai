@@ -54,21 +54,23 @@ default_prompt = """
 | 这篇作文真实有趣，内容围绕“中国之旅”展开，表达了作者对中国文化和生活的感受。语言整体较通顺，但句子的丰富性和语法准确性还可以提高。建议多读中文文章，学习常用表达，并尝试使用更多不同的句型。总体来说，表现不错，要继续努力！ |
 """
 
-# 修改建议提示词 - 对话机器人（英文回应）
-revision_prompt = """
-You are an essay revision assistant for intermediate-level Chinese language learners. Your task is to provide specific revision suggestions based on the student's request regarding their Chinese essay. The essay, its title, and requirements are provided below, along with the student's specific revision request. Please respond in English, offering clear, concise, and actionable suggestions to improve the essay. Focus on the specific issues or areas mentioned in the student's request. If the request is vague, provide general suggestions to enhance clarity, grammar, vocabulary, or structure. Use the following format for your response:
+# 聊天机器人提示词 - 作文修改（英文回应）
+chat_revision_prompt = """
+You are a helpful essay revision assistant for intermediate-level Chinese language learners. Your task is to provide specific, actionable revision suggestions in English based on the student's request regarding their Chinese essay. The essay title, requirements, content, and the student's specific revision request are provided below. Focus on addressing the student's request (e.g., improving grammar, vocabulary, structure, or clarity). If the request is vague, provide general suggestions to enhance the essay's quality. Use the following format for your response:
 
 **Revision Suggestions**  
-- **Issue 1**: [Describe the issue based on the student's request or identified problem]  
-  **Suggestion**: [Provide a specific, actionable suggestion in English]  
-- **Issue 2**: [Describe another issue, if applicable]  
-  **Suggestion**: [Provide another specific suggestion]  
-- **General Advice**: [Provide overall advice for improving the essay]
+- **Issue 1**: [Describe the specific issue based on the student's request or identified problem]  
+  **Suggestion**: [Provide a clear, actionable suggestion to address the issue]  
+- **Issue 2**: [Describe another specific issue, if applicable]  
+  **Suggestion**: [Provide another actionable suggestion]  
+- **General Advice**: [Provide overall advice for improving the essay, considering the title, requirements, and content]
 
 **Essay Title**: {title}  
 **Essay Requirements**: {requirements}  
 **Essay Content**: {content}  
 **Student's Revision Request**: {request}
+
+Ensure your response is concise, encouraging, and tailored to the student's needs as an intermediate Chinese learner.
 """
 
 # Streamlit 应用
@@ -76,7 +78,7 @@ st.set_page_config(page_title="汉语作文批改与修改助手", layout="wide"
 st.title("💯 汉语作文批改与修改助手")
 
 # 创建两个选项卡
-tab1, tab2 = st.tabs(["📝 作文批改", "🤖 作文修改助手"])
+tab1, tab2 = st.tabs(["📝 作文批改", "🤖 作文修改聊天机器人"])
 
 # 界面一：作文批改
 with tab1:
@@ -87,7 +89,7 @@ with tab1:
     """)
 
     # 用户输入
-    st.subheader("✍️ 作文输入 Lilliputian: 请输入作文内容：")
+    st.subheader("✍️ 作文输入")
     essay_title = st.text_input("请输入作文题目：", placeholder="我的梦想")
     essay_requirements = st.text_area("请输入作文要求：", placeholder="例如：写一篇关于梦想的文章，300-500字，需包含个人目标和实现计划。", height=100)
     essay_content = st.text_area("请输入作文内容：", 
@@ -141,46 +143,62 @@ with tab1:
         else:
             st.error("请输入作文题目和内容！")
 
-# 界面二：作文修改助手
+# 界面二：作文修改聊天机器人
 with tab2:
     st.markdown("""
-    欢迎使用“作文修改助手”！  
-    请在下方输入作文题目、作文要求、作文内容以及您的具体修改要求，我们将以英文提供针对性的修改建议。  
-    例如：您可以要求改进语法、丰富词汇或优化结构等。
+    欢迎使用“作文修改聊天机器人”！  
+    请先输入作文题目、要求和内容，然后通过聊天框提出您的修改要求（例如：改进语法、丰富词汇、优化结构等）。  
+    机器人将以英文提供针对性的修改建议。
     """)
 
-    # 用户输入
-    st.subheader("✍️ 提交作文与修改要求")
+    # 用户输入作文信息
+    st.subheader("✍️ 提交作文信息")
     revision_title = st.text_input("请输入作文题目：", placeholder="我的梦想", key="revision_title")
     revision_requirements = st.text_area("请输入作文要求：", placeholder="例如：写一篇关于梦想的文章，300-500字，需包含个人目标和实现计划。", height=100, key="revision_requirements")
     revision_content = st.text_area("请输入作文内容：", 
         placeholder="请输入需要修改的作文内容...", 
         height=200, key="revision_content")
-    revision_request = st.text_area("请输入修改要求：", 
-        placeholder="例如：请帮助我改进语法的准确性，替换重复词汇，并增强段落之间的逻辑连接。", 
-        height=100, key="revision_request")
 
-    # 响应区域
-    if st.button("生成修改建议"):
-        if revision_title and revision_content and revision_request:
-            llm = create_llm()
-            with st.spinner("正在生成修改建议..."):
-                try:
-                    # 组合提示词
-                    user_input = revision_prompt.format(
-                        title=revision_title,
-                        requirements=revision_requirements,
-                        content=revision_content,
-                        request=revision_request
-                    )
-                    response = llm.invoke([
-                        {"role": "system", "content": user_input},
-                        {"role": "user", "content": revision_request}
-                    ])
-                    st.subheader("✒️ 修改建议")
-                    st.success(response.content)
+    # 初始化会话状态以存储聊天历史
+    if "chat_history" not in st.session_state:
+        st.session_state.chat_history = []
+
+    # 显示聊天历史
+    st.subheader("💬 聊天记录")
+    for message in st.session_state.chat_history:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+
+    # 聊天输入框
+    revision_request = st.chat_input("请输入您的修改要求（例如：请改进语法的准确性）")
+
+    # 处理聊天输入
+    if revision_request and revision_title and revision_content:
+        # 添加用户消息到聊天历史
+        st.session_state.chat_history.append({"role": "user", "content": revision_request})
+        
+        llm = create_llm()
+        with st.spinner("正在生成修改建议..."):
+            try:
+                # 组合提示词
+                user_input = chat_revision_prompt.format(
+                    title=revision_title,
+                    requirements=revision_requirements,
+                    content=revision_content,
+                    request=revision_request
+                )
+                response = llm.invoke([
+                    {"role": "system", "content": user_input},
+                    {"role": "user", "content": revision_request}
+                ])
                 
-                except Exception as e:
-                    st.error(f"生成修改建议失败：{e}")
-        else:
-            st.error("请输入作文题目、内容和修改要求！")
+                # 添加机器人回复到聊天历史
+                st.session_state.chat_history.append({"role": "assistant", "content": response.content})
+                
+                # 刷新页面以显示最新消息
+                st.rerun()
+            
+            except Exception as e:
+                st.error(f"生成修改建议失败：{e}")
+    elif revision_request and (not revision_title or not revision_content):
+        st.error("请输入作文题目和内容后再提出修改要求！")
