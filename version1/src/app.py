@@ -76,7 +76,8 @@ please answer in English
 
 # Streamlit 应用
 st.set_page_config(page_title="汉语作文批改与修改助手", layout="wide")
-st.title("💯 汉语作文批改与修改助手")
+st.title("💯 Assistant for correcting and modifying Chinese compositions
+            汉语作文批改与修改助手")
 
 # 创建两个选项卡
 tab1, tab2 = st.tabs(["📝 作文批改", "🤖 作文修改聊天机器人"])
@@ -87,6 +88,9 @@ with tab1:
     欢迎使用“汉语作文批改助手”！  
     请在下方输入作文题目、作文要求和作文内容，我们将为您提供评分和修改建议。  
     建议每次输入的作文内容不超过2000字。
+    Welcome to use "Chinese Composition Correction Assistant"!
+    Please enter the title, requirements and content of your composition below. We will provide you with a score and suggestions for revision.
+    It is recommended that the content of each input should not exceed 2,000 words.
     """)
 
     # 用户输入
@@ -150,6 +154,9 @@ with tab2:
     欢迎使用“作文修改聊天机器人”！  
     请先输入作文题目、要求和内容，然后通过聊天框提出您的修改要求（例如：改进语法、丰富词汇、优化结构等）。  
     机器人将以英文提供针对性的修改建议。
+    Welcome to use the "Essay Revision Chatbot"!
+    Please first enter the title, requirements and content of your composition, and then put forward your revision requests (such as: improving grammar, enriching vocabulary, optimizing structure, etc.) through the chat box.
+    The robot will provide targeted modification suggestions in English.
     """)
 
     # 用户输入作文信息
