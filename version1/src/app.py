@@ -171,7 +171,7 @@ with tab2:
         st.session_state.chat_history = []
 
     # 显示聊天历史
-    st.subheader("💬 聊天记录")
+    st.subheader("💬 聊天")
     for message in st.session_state.chat_history:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
