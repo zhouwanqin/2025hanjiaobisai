@@ -71,6 +71,7 @@ You are a helpful essay revision assistant for intermediate-level Chinese langua
 **Student's Revision Request**: {request}
 
 Ensure your response is concise, encouraging, and tailored to the student's needs as an intermediate Chinese learner.
+please answer in English
 """
 
 # Streamlit 应用
