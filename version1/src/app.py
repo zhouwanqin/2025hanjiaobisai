@@ -151,19 +151,15 @@ with tab1:
 # 界面二：作文修改聊天机器人（升级版：统一作文信息 + 两个聊天机器人）
 with tab2:
     st.markdown("""
-    ### 🧩 作文信息（两个机器人共享）
-    请先在这里输入作文的基本信息，下面的 **“聊天机器人1”** 和 **“聊天机器人2”** 都会参考这里的内容。
+    ### 🧩 作文信息
+    请先在这里输入作文的基本信息。
     """)
 
     # 统一作文输入区
     col_a, col_b = st.columns(2)
     with col_a:
-        common_title = st.text_input("作文题目", placeholder="例如：难忘的一天", key="common_title")
-        common_requirements = st.text_area("作文要求 / 写作任务说明", placeholder="例如：记叙一次令你印象深刻的经历，注意时间顺序和细节描写，字数400-500字。", height=120, key="common_requirements")
-    with col_b:
-        common_meta = st.text_area("学生背景 / 班级 / 写作水平（可选）", placeholder="例如：七年级学生，写作积极性一般；这篇作文是期中复习任务；老师希望学生能写得更细。", height=120, key="common_meta")
-
-    common_content = st.text_area("✍️ 学生作文内容", placeholder="请把学生的整篇作文贴在这里，后面的两个机器人都会用到。", height=200, key="common_content")
+        common_title = st.text_input("关于作文的一切", placeholder="例如：题目《难忘的一天》", key="common_title")
+       
 
     # 二级 tab：两个不同职责的聊天机器人
     subtab1, subtab2 = st.tabs(["🟣 聊天机器人1：动机&构思引导", "🟦 聊天机器人2：写作案例&具体指导"])
@@ -192,10 +188,8 @@ with tab2:
             # 生成机器人1的系统prompt
             chatbot1_system_prompt = f"""
 你现在的身份是一名“极其温柔、有耐心、懂儿童青少年写作心理、同时又懂语文写作规律”的一对一作文辅导老师。你的首要任务不是打分，也不是挑错，而是“把一个对写作文没信心、没想法、甚至有点抵触的学生，慢慢带回到愿意动笔的状态”，再一点点帮他把思路搭起来。
-- 作文题目：{common_title or "（学生未填写）"}
-- 作文要求/任务说明：{common_requirements or "（学生未填写）"}
-- 学生背景/写作水平：{common_meta or "（未说明，可按初中生处理）"}
-- 学生作文内容：{common_content or "（学生还没粘贴作文，可以先帮他想思路）"}
+- 作文信息：{common_title or "（学生未填写）"}
+
 【学生可能的状态】
 - 他说“我写得不好/老师总说我空/我不会写这一篇/我没经历/我语文不好”；
 - 他可能只给了作文题目，没有作文正文；
@@ -304,10 +298,8 @@ with tab2:
 
             chatbot2_system_prompt = f"""
 你现在的身份是一名“会一边改一边教的语文写作教练”，你要做的不是泛泛地夸或泛泛地讲“作文要有中心思想”，而是要**对这一篇作文/这个题目的写法做手把手的指导**，像课堂上的“示范讲解+对比修改”那一段。
-【作文信息】：
-- 作文题目：{common_title or "（未提供）"}
-- 作文要求/写作任务：{common_requirements or "（未提供）"}
-- 学生作文原文：{common_content or "（未提供原文，此时你可以先给一个对应题目的“示范段落”，再告诉学生怎么套用）"}
+- 作文信息：{common_title or "（学生未填写）"}
+
 
 这次辅导的目标是：
 1. 先看懂学生要写什么（题目、文体、写作任务）；
