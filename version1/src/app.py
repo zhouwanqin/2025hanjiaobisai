@@ -81,72 +81,6 @@ st.title("💯 Writing and Assessing Chinese L2 Essays 中文二语写作与阅�
 
 # 创建两个选项卡
 tab1, tab2 = st.tabs(["🤖 作文修改聊天机器人","📝 写作阅评机器人" ])
-
-# 界面一：作文批改
-with tab1:
-    st.markdown("""
-    欢迎使用“汉语作文批改助手”！  
-    请在下方输入作文题目、作文要求和作文内容，我们将为您提供评分和修改建议。  
-    建议每次输入的作文内容不超过2000字。
-    Welcome to use "Chinese Composition Correction Assistant"!
-    Please enter the title, requirements and content of your composition below. We will provide you with a score and suggestions for revision.
-    It is recommended that the content of each input should not exceed 2,000 words.
-    """)
-
-    # 用户输入
-    st.subheader("✍️ 作文输入")
-    essay_title = st.text_input("请输入作文题目：", placeholder="我的梦想")
-    essay_requirements = st.text_area("请输入作文要求：", placeholder="例如：写一篇关于梦想的文章，300-500字，需包含个人目标和实现计划。", height=100)
-    essay_content = st.text_area("请输入作文内容：", 
-        placeholder="""《我的梦想》
-每个人都有自己的梦想，我也有一个属于自己的梦想。我的梦想是成为一名老师。
-老师是一个非常神圣的职业，他们像一盏明灯，为我们照亮前进的道路；像一位园丁，细心地培育我们这些小花小草；更像我们的朋友，陪伴我们一起成长。每当我看到老师站在讲台上认真讲课的样子，我就特别羡慕，也想像他们一样，把知识传授给更多的人。
-我知道，要实现这个梦想并不容易。首先，我要努力学习，尤其是语文、数学和英语这三门主科，因为它们是我未来学习的基础。其次，我要多读书，开阔自己的眼界，增长见识。最后，我要锻炼自己的表达能力，这样将来才能更好地与同学们交流。
-虽然我现在还是一名小学生，离梦想还有很远的距离，但我相信只要我坚持不懈地努力，总有一天我会实现自己的梦想，成为一名优秀的老师！
-        """, 
-        height=200)
-
-    # 响应区域
-    if st.button("生成批改结果"):
-        if essay_title and essay_content:
-            llm = create_llm()
-            with st.spinner("正在批改作文..."):
-                try:
-                    # 组合提示词，包含题目、要求和内容
-                    user_input = f"作文题目：{essay_title}\n作文要求：{essay_requirements}\n作文内容：{essay_content}"
-                    response = llm.invoke([
-                        {"role": "system", "content": default_prompt},
-                        {"role": "user", "content": user_input}
-                    ])
-                    st.subheader("✒️ 批改结果")
-                    st.success(response.content)
-                    
-                    # 提取评分信息
-                    extraction_prompt = """
-                    请从以下作文批改结果中提取出各评分维度的得分，并以纯JSON格式返回。键为评分维度，值为对应得分（数值范围均为0~10）。请只返回JSON，不要其他任何解释。键使用英文：['Title', 'Language', 'Content', 'Structure', 'Others']
-                    作文批改结果：
-                    {response_content}
-                    """
-                    extraction_response = llm.invoke([
-                        {"role": "system", "content": extraction_prompt.format(response_content=response.content)}
-                    ])
-
-                    try:
-                        scores = json.loads(extraction_response.content.strip())
-                    except Exception as e:
-                        st.error("评分数据提取失败，请检查模型输出格式。")
-                        scores = {}
-                    
-                    if scores:
-                        # 可视化评分
-                        st.subheader("📊 评分可视化")
-                        fig = visualize_metrics({k: {"score": v} for k, v in scores.items()})
-                        st.pyplot(fig)
-                
-                except Exception as e:
-                    st.error(f"批改失败：{e}")
-        else:
-            st.error("请输入作文题目和内容！")
             
 # 界面二：作文修改聊天机器人（升级版：统一作文信息 + 两个聊天机器人）
 with tab2:
@@ -391,4 +325,69 @@ with tab2:
             st.session_state.chatbot2_history.append({"role": "assistant", "content": bot_answer_2})
             with st.chat_message("assistant"):
                 st.markdown(bot_answer_2)
+# 界面一：作文批改
+with tab1:
+    st.markdown("""
+    欢迎使用“汉语作文批改助手”！  
+    请在下方输入作文题目、作文要求和作文内容，我们将为您提供评分和修改建议。  
+    建议每次输入的作文内容不超过2000字。
+    Welcome to use "Chinese Composition Correction Assistant"!
+    Please enter the title, requirements and content of your composition below. We will provide you with a score and suggestions for revision.
+    It is recommended that the content of each input should not exceed 2,000 words.
+    """)
+
+    # 用户输入
+    st.subheader("✍️ 作文输入")
+    essay_title = st.text_input("请输入作文题目：", placeholder="我的梦想")
+    essay_requirements = st.text_area("请输入作文要求：", placeholder="例如：写一篇关于梦想的文章，300-500字，需包含个人目标和实现计划。", height=100)
+    essay_content = st.text_area("请输入作文内容：", 
+        placeholder="""《我的梦想》
+每个人都有自己的梦想，我也有一个属于自己的梦想。我的梦想是成为一名老师。
+老师是一个非常神圣的职业，他们像一盏明灯，为我们照亮前进的道路；像一位园丁，细心地培育我们这些小花小草；更像我们的朋友，陪伴我们一起成长。每当我看到老师站在讲台上认真讲课的样子，我就特别羡慕，也想像他们一样，把知识传授给更多的人。
+我知道，要实现这个梦想并不容易。首先，我要努力学习，尤其是语文、数学和英语这三门主科，因为它们是我未来学习的基础。其次，我要多读书，开阔自己的眼界，增长见识。最后，我要锻炼自己的表达能力，这样将来才能更好地与同学们交流。
+虽然我现在还是一名小学生，离梦想还有很远的距离，但我相信只要我坚持不懈地努力，总有一天我会实现自己的梦想，成为一名优秀的老师！
+        """, 
+        height=200)
+
+    # 响应区域
+    if st.button("生成批改结果"):
+        if essay_title and essay_content:
+            llm = create_llm()
+            with st.spinner("正在批改作文..."):
+                try:
+                    # 组合提示词，包含题目、要求和内容
+                    user_input = f"作文题目：{essay_title}\n作文要求：{essay_requirements}\n作文内容：{essay_content}"
+                    response = llm.invoke([
+                        {"role": "system", "content": default_prompt},
+                        {"role": "user", "content": user_input}
+                    ])
+                    st.subheader("✒️ 批改结果")
+                    st.success(response.content)
+                    
+                    # 提取评分信息
+                    extraction_prompt = """
+                    请从以下作文批改结果中提取出各评分维度的得分，并以纯JSON格式返回。键为评分维度，值为对应得分（数值范围均为0~10）。请只返回JSON，不要其他任何解释。键使用英文：['Title', 'Language', 'Content', 'Structure', 'Others']
+                    作文批改结果：
+                    {response_content}
+                    """
+                    extraction_response = llm.invoke([
+                        {"role": "system", "content": extraction_prompt.format(response_content=response.content)}
+                    ])
+
+                    try:
+                        scores = json.loads(extraction_response.content.strip())
+                    except Exception as e:
+                        st.error("评分数据提取失败，请检查模型输出格式。")
+                        scores = {}
+                    
+                    if scores:
+                        # 可视化评分
+                        st.subheader("📊 评分可视化")
+                        fig = visualize_metrics({k: {"score": v} for k, v in scores.items()})
+                        st.pyplot(fig)
+                
+                except Exception as e:
+                    st.error(f"批改失败：{e}")
+        else:
+            st.error("请输入作文题目和内容！")
 
